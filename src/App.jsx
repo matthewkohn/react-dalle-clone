@@ -45,7 +45,8 @@ const App = () => {
           "Content-Type": "application/json"
         }
       }
-      const response = await fetch('http://localhost:8000/images', options);
+      const response = await fetch('./netlify/functions/images', options);
+      // const response = await fetch('http://localhost:8000/images', options);
       const data = await response.json()
       console.log(data);
       setBufferOpen(false);
@@ -67,7 +68,8 @@ const App = () => {
         method: "POST",
         body: formData
       }
-      const response = await fetch('http://localhost:8000/upload', options)
+      const response = await fetch('./netlify/functions/upload', options);
+      // const response = await fetch('http://localhost:8000/upload', options)
       const data = await response.json();
       console.log(data)
       setBufferOpen(false);
@@ -89,7 +91,8 @@ const App = () => {
       const options = {
         method: 'POST'
       }
-      const response = await fetch('http://localhost:8000/variations', options);
+      const response = await fetch('./netlify/functions/variations', options);
+      // const response = await fetch('http://localhost:8000/variations', options);
       setModalOpen(false);
       const data = await response.json();
       // console.log(data)
