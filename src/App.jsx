@@ -1,16 +1,24 @@
 import { useState } from "react";
+import Modal from "./components/modal";
+import LinearBuffer from "./LinearBuffer";
+
 
 const App = () => {
   const [images, setImages] = useState(null);
-  const [inputValue, setInputValue] = useState(null);
+  const [inputValue, setInputValue] = useState('');
   const [error, setError] = useState(null);
   const [selectedImage, setSelectedImage] = useState(null);
-
+  const [modalOpen, setModalOpen] = useState(false);
+  const [bufferOpen, setBufferOpen] = useState(false);
 
   const surpriseOptions = [
-    'A blue ostrich eating melon',
-    'A matisse style shark on the telephone',
-    'A pineapple sunbathing on an island'
+    'A small mouse chasing a scared cat with a cartoon hammer',
+    'A baseball player swinging a bat at the moon',
+    'A sloth and a monkey swinging from jungle trees',
+    'A turkey eating french fries in a nightclub',
+    'Gigantic bumblebees pollinating an apple orchard',
+    'Dinosaurs doing their taxes',
+    'A cute dog flying a magic carpet'
   ];
 
   const surpriseMe = () => {
@@ -20,12 +28,13 @@ const App = () => {
   }
   
   const getImages = async() => {
-    setImages(null)
-    if (inputValue === null) {
+    setImages(null);
+    if (inputValue === '') {
       setError('Error! Must have a search term.');
       return;     
     }
     try {
+      setBufferOpen(true);
       const options = {
         method: "POST",
         body: JSON.stringify({
@@ -38,6 +47,7 @@ const App = () => {
       const response = await fetch('http://localhost:8000/images', options);
       const data = await response.json()
       console.log(data);
+      setBufferOpen(false);
       setImages(data);
     } catch (error) {
       console.error(error);
@@ -45,11 +55,12 @@ const App = () => {
   }
 
   const uploadImage = async (e) => {
-    console.log(e.target.files)
+    setBufferOpen(true);
     const formData = new FormData();
     formData.append('file', e.target.files[0]);
+    setModalOpen(true);
     setSelectedImage(e.target.files[0]);
-    
+    e.target.value = null;
     try {
       const options = {
         method: "POST",
@@ -58,6 +69,31 @@ const App = () => {
       const response = await fetch('http://localhost:8000/upload', options)
       const data = await response.json();
       console.log(data)
+      setBufferOpen(false);
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  const generateVariations = async () => {
+    setImages(null)
+    if (selectedImage === null) {
+      setError('Error! Must have an existing image')
+      setModalOpen(false)
+      return
+    }
+    try {
+      setBufferOpen(true);
+      const options = {
+        method: 'POST'
+      }
+      const response = await fetch('http://localhost:8000/variations', options);
+      setModalOpen(false);
+      const data = await response.json();
+      // console.log(data)
+      setImages(data);
+      setBufferOpen(false);
+      setError(null);
 
     } catch (error) {
       console.error(error);
@@ -93,21 +129,35 @@ const App = () => {
            to edit.
         </p>
         { error && <p>{ error }</p> }
+        { modalOpen && <div className="overlay">
+          <Modal 
+            setModalOpen={ setModalOpen }
+            selectedImage={ selectedImage } 
+            setSelectedImage={ setSelectedImage }
+            generateVariations={ generateVariations }
+            setBufferOpen={ setBufferOpen }
+          />
+        </div> }
       </section>
       <section className="image-section">
-        {images?.map((image, _index) => (
-          <img 
-            key={_index} 
-            src={image.url} 
-            alt={`Generated image of ${ inputValue }`} 
-          />
-        ))}
+        { bufferOpen && (
+          <>
+            <p>ChatGPT is creating your images, hang tight!</p>
+            <LinearBuffer />
+          </>
+        ) }
+        { 
+          images?.map((image, _index) => (
+            <img 
+              key={_index} 
+              src={image.url} 
+              alt={`Generated image of ${ inputValue }`} 
+            />
+          ))
+        }
       </section>
     </div>
   )
 }
 
 export default App
-
-
-// 4:00:22 https://www.youtube.com/watch?v=uRQH2CFvedY  

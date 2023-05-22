@@ -4,7 +4,7 @@ import dotenv from 'dotenv';
 import { Configuration, OpenAIApi } from "openai";
 import fs from 'fs';
 import multer from 'multer';
-import { basename } from 'path';
+// import { basename } from 'path';
 
 const PORT = 8000;
 const app = express();
@@ -27,12 +27,13 @@ const storage = multer.diskStorage({
   }
 })
 const upload = multer({ storage: storage }).single('file')
+let filePath
 
 app.post('/images', async (req, res) => {
   try {
     const response = await openai.createImage({
       prompt: req.body.message,
-      n: 10,
+      n: 6,
       size: "1024x1024",
     });
     res.send(response.data.data);
@@ -49,9 +50,23 @@ app.post('/upload', (req, res) => {
     } else if (err) {
       return res.status(500).json(err);
     }
-    console.log(req.file)
+     filePath = req.file.path
   })
 })
+
+app.post('/variations', async (req, res) => {
+  try {
+    const response = await openai.createImageVariation(
+      fs.createReadStream(filePath),
+      6,
+      "1024x1024"
+    )
+    res.send(response.data.data)
+  } catch (error) {
+    console.error(error)
+  }
+})
+
 
 
 app.listen(PORT, () => console.log('Your server is running on PORT ' + PORT));
