@@ -30,13 +30,18 @@ p {
   height: 200px;
 }
 
-.surprise {
+.surprise, .upload {
   background-color: #ececf1;
   color: #000;
   border-radius: 5px;
   font-weight: 600;
-  padding: 4px 12px;
+  padding: 4px 8px;
   margin: 0 0 2px 5px;
+}
+
+.surprise:hover, .upload:hover {
+  cursor: pointer;
+  background-color: rgba(3, 165, 3, 0.15);
 }
 
 .input-container {
@@ -142,4 +147,20 @@ p {
   width: 256px;
   overflow: hidden;
   
+}
+
+.clearBtn {
+  max-width: 40px;
+}
+
+.clearBtn:hover {
+  background:rgba(82,0,0, 0.15)
+}
+
+.generateBtn {
+  min-width: 150px;
+}
+
+.generateBtn:hover {
+  background:rgba(3, 165, 3, 0.15)
 }

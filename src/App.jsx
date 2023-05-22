@@ -34,6 +34,7 @@ const App = () => {
       return;     
     }
     try {
+      setError(null);
       setBufferOpen(true);
       const options = {
         method: "POST",
@@ -83,6 +84,7 @@ const App = () => {
       return
     }
     try {
+      setError(null);
       setBufferOpen(true);
       const options = {
         method: 'POST'
@@ -93,11 +95,18 @@ const App = () => {
       // console.log(data)
       setImages(data);
       setBufferOpen(false);
-      setError(null);
 
     } catch (error) {
       console.error(error);
     }
+  }
+
+  const clearInput = () => {
+    setImages(null);
+    setInputValue('');
+    setError(null);
+    setSelectedImage(null);
+    setBufferOpen(false);
   }
 
   return (
@@ -113,11 +122,12 @@ const App = () => {
             onChange={ (e) => setInputValue(e.target.value) }
             value={ inputValue }
           />
-          <button onClick={getImages}>Generate</button>
+          <button className="clearBtn" onClick={ clearInput } >X</button>
+          <button className="generateBtn" onClick={ getImages }>Generate</button>
         </div>
         <p className="extra-info">Or,
           <span>
-            <label htmlFor="files"> upload an image </label>
+            <label className="upload" htmlFor="files"> upload an image </label>
             <input 
               onChange={ uploadImage }
               type="file" 
